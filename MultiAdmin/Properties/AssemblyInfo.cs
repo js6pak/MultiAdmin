@@ -4,10 +4,10 @@ using MultiAdmin;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle(nameof(MultiAdmin) + " v" + Program.MaVersion)]
+[assembly: AssemblyTitle(nameof(MultiAdmin) + " v" + Program.MaVersion + "-js6pak")]
 [assembly: AssemblyDescription("A program for running a SCP: Secret Laboratory server with additional functionality")]
 [assembly: AssemblyProduct(nameof(MultiAdmin))]
-[assembly: AssemblyCopyright("Copyright © Grover 2019")]
+[assembly: AssemblyCopyright("Copyright © js6pak 2020")]
 
 // Version information for an assembly consists of the following four values:
 //

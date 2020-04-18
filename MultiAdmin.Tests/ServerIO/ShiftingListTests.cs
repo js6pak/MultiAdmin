@@ -1,22 +1,21 @@
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
+using Xunit;
 using MultiAdmin.ServerIO;
 
-namespace MultiAdminTests.ServerIO
+namespace MultiAdmin.Tests.ServerIO
 {
-	[TestClass]
 	public class ShiftingListTests
 	{
-		[TestMethod]
+		[Fact]
 		public void ShiftingListTest()
 		{
 			const int maxCount = 2;
 			ShiftingList shiftingList = new ShiftingList(maxCount);
 
-			Assert.AreEqual(shiftingList.MaxCount, maxCount);
+			Assert.Equal(shiftingList.MaxCount, maxCount);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void AddTest()
 		{
 			const int maxCount = 2;
@@ -28,15 +27,15 @@ namespace MultiAdminTests.ServerIO
 				shiftingList.Add($"Test{i}");
 			}
 
-			Assert.AreEqual(shiftingList.Count, maxCount);
+			Assert.Equal(shiftingList.Count, maxCount);
 
 			for (int i = 0; i < shiftingList.Count; i++)
 			{
-				Assert.AreEqual(shiftingList[i], $"Test{entriesToAdd - i - 1}");
+				Assert.Equal(shiftingList[i], $"Test{entriesToAdd - i - 1}");
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void RemoveFromEndTest()
 		{
 			const int maxCount = 6;
@@ -53,15 +52,15 @@ namespace MultiAdminTests.ServerIO
 				shiftingList.RemoveFromEnd();
 			}
 
-			Assert.AreEqual(shiftingList.Count, Math.Max(maxCount - entriesToRemove, 0));
+			Assert.Equal(shiftingList.Count, Math.Max(maxCount - entriesToRemove, 0));
 
 			for (int i = 0; i < shiftingList.Count; i++)
 			{
-				Assert.AreEqual(shiftingList[i], $"Test{maxCount - i - 1}");
+				Assert.Equal(shiftingList[i], $"Test{maxCount - i - 1}");
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void ReplaceTest()
 		{
 			const int maxCount = 6;
@@ -81,9 +80,9 @@ namespace MultiAdminTests.ServerIO
 				}
 			}
 
-			Assert.AreEqual(shiftingList.Count, maxCount);
+			Assert.Equal(shiftingList.Count, maxCount);
 
-			Assert.AreEqual(shiftingList[indexToReplace], "Replaced");
+			Assert.Equal("Replaced", shiftingList[indexToReplace]);
 		}
 	}
 }

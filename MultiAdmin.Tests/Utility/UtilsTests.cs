@@ -1,10 +1,10 @@
 using System;
-using Microsoft.VisualStudio.TestTools.UnitTesting;
 using MultiAdmin.Utility;
+using Xunit;
+using Xunit.Sdk;
 
-namespace MultiAdminTests.Utility
+namespace MultiAdmin.Tests.Utility
 {
-	[TestClass]
 	public class UtilsTests
 	{
 		private struct StringMatchingTemplate
@@ -51,14 +51,14 @@ namespace MultiAdminTests.Utility
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void GetFullPathSafeTest()
 		{
 			string result = Utils.GetFullPathSafe(" ");
-			Assert.IsNull(result, $"Expected \"null\", got \"{result}\"");
+			Assert.Null(result);
 		}
 
-		[TestMethod]
+		[Fact]
 		public void StringMatchesTest()
 		{
 			StringMatchingTemplate[] matchTests =
@@ -84,16 +84,16 @@ namespace MultiAdminTests.Utility
 
 					bool result = Utils.StringMatches(test.input, test.pattern);
 
-					Assert.IsTrue(test.expectedResult == result, $"Failed on test index {i}: Expected \"{test.expectedResult}\", got \"{result}\"");
+					Assert.True(test.expectedResult == result, $"Failed on test index {i}: Expected \"{test.expectedResult}\", got \"{result}\"");
 				}
 				catch (Exception e)
 				{
-					Assert.Fail($"Failed on test index {i}: {e}");
+					throw new XunitException($"Failed on test index {i}: {e}");
 				}
 			}
 		}
 
-		[TestMethod]
+		[Fact]
 		public void CompareVersionStringsTest()
 		{
 			CompareVersionTemplate[] versionTests =
@@ -123,7 +123,7 @@ namespace MultiAdminTests.Utility
 
 				int result = Utils.CompareVersionStrings(test.firstVersion, test.secondVersion);
 
-				Assert.IsTrue(test.CheckResult(result), $"Failed on test index {i}: Expected \"{test.expectedResult}\", got \"{result}\"");
+				Assert.True(test.CheckResult(result), $"Failed on test index {i}: Expected \"{test.expectedResult}\", got \"{result}\"");
 			}
 		}
 	}
