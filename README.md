@@ -1,18 +1,13 @@
-# Looking for ServerMod?
-ServerMod is on its own repo now: https://github.com/Grover-c13/Smod2/
+# MultiAdmin+
+MultiAdmin+ is a MultiAdmin fork adding few features
 
-# MultiAdmin
-MultiAdmin is a replacement server tool for SCP: Secret Laboratory, which was built to help enable servers to have multiple configurations per server instance.
+The latest release can be found here: [Release link](https://github.com/js6pak/MultiAdminPlus/releases/latest)
 
-The latest release can be found here: [Release link](https://github.com/Grover-c13/MultiAdmin/releases/latest)
-
-Please check the [Installation Instructions](https://github.com/Grover-c13/MultiAdmin#installation-instructions) for information about installing and running MultiAdmin.
-
-## Discord
-You can join our Discord server here: https://discord.gg/8nvmMTr
+Please check the [Installation Instructions](https://github.com/js6pak/MultiAdmin#installation-instructions) for information about installing and running MultiAdmin.
 
 ## Installation Instructions:
-Make sure that you are running Mono 5.18.0 or higher, otherwise you might have issues. The latest Mono release can be found here: https://www.mono-project.com/download/stable.
+Make sure that you are running .NET Core 3.1 or higher
+
 ### Running a Single Server with MultiAdmin
 1. Place MultiAdmin.exe in your root server directory (next to LocalAdmin.exe)
 
@@ -23,6 +18,10 @@ Make sure that you are running Mono 5.18.0 or higher, otherwise you might have i
 4. Optional: Create a file named `scp_multiadmin.cfg` within your server's folder for configuring MultiAdmin specifically for that server
 
 ## Features
+#### MA+
+- [Colors!](https://i.imgur.com/tomTwJ0.png) *because who doesn't like them! P.S. if you actually don't like colors you disable can them using [`NO_COLOR`](https://no-color.org/)*
+- Better mod loaders support (EXILED, SMod, \[REDACTED])
+#### MA
 - Config Reload: Reloads the MultiAdmin configuration file
 - Exit Command: Adds a graceful exit command
 - Folder Copy Round Queue: Copies files from folders in a queue
@@ -103,6 +102,3 @@ servers_folder | String | servers | The location of the `servers` folder for Mul
 set_title_bar | Boolean | True | Whether to set the console window's titlebar, if false, this feature won't be used
 shutdown_when_empty_for | Integer | -1 | Shutdown the server once a round hasn't started in a number of seconds
 start_config_on_full | String | **Empty** | Start server with this config folder once the server becomes full [Requires ServerMod]
-
-## Upcoming Features
-- Support for running multiple server instances in one MultiAdmin instance
