@@ -5,8 +5,9 @@ The latest release can be found here: [Release link](https://github.com/js6pak/M
 
 Please check the [Installation Instructions](https://github.com/js6pak/MultiAdmin#installation-instructions) for information about installing and running MultiAdmin.
 
-## Installation Instructions:
-Make sure that you are running .NET Core 3.1 or higher
+## Requirments
+- .NET Core 3.1 or higher
+- Terminal supporting [true color](https://gist.github.com/XVilka/8346728#terminals--true-color) (basically most linux terminals and win10) *i will maybe try to make it work on non true color terminals in future*
 
 ### Running a Single Server with MultiAdmin
 1. Place MultiAdmin.exe in your root server directory (next to LocalAdmin.exe)
