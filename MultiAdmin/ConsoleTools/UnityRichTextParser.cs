@@ -64,8 +64,7 @@ namespace MultiAdmin
 
 					var ch = text[i];
 					Match match;
-					if ((match = GetMatch(text, i,
-						new Regex("^<(color|size|b|i|material|quad)=?([^>]*)>", RegexOptions.IgnoreCase))).Success)
+					if ((match = GetMatch(text, i, new Regex("^<(color|size|b|i|material|quad)=?([^>]*)>", RegexOptions.IgnoreCase))).Success)
 					{
 						skip += match.Length - 1;
 
@@ -104,13 +103,10 @@ namespace MultiAdmin
 					else
 					{
 						message.text += ch;
-
-						if (i == text.Length - 1)
-						{
-							messages.Add(message);
-						}
 					}
 				}
+
+				messages.Add(message);
 			}
 			catch (Exception)
 			{
