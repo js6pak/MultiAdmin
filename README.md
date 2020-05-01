@@ -19,7 +19,7 @@ Make sure that you are running .NET Core 3.1 or higher
 
 ## Features
 #### MA+
-- [Colors!](https://i.imgur.com/tomTwJ0.png) *because who doesn't like them! P.S. if you actually don't like colors you can them using [`NO_COLOR`](https://no-color.org/)*
+- [Colors!](https://i.imgur.com/tomTwJ0.png) *because who doesn't like them! P.S. if you actually don't like colors you disable can them using [`NO_COLOR`](https://no-color.org/)*
 - Better mod loaders support (EXILED, SMod, \[REDACTED])
 #### MA
 - Config Reload: Reloads the MultiAdmin configuration file
