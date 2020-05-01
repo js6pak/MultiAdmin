@@ -1,5 +1,7 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
+using MultiAdmin.ConsoleTools;
 using MultiAdmin.Features.Attributes;
 using MultiAdmin.Utility;
 
@@ -25,18 +27,18 @@ namespace MultiAdmin.Features
 		public void OnCall(string[] args)
 		{
 			Server.Write("Commands from MultiAdmin:");
-			List<string> helpOutput = new List<string>();
-			foreach (KeyValuePair<string, ICommand> command in Server.commands)
+			var helpOutput = new List<string>();
+			foreach (var command in Server.commands)
 			{
-				string usage = command.Value.GetUsage();
+				var usage = command.Value.GetUsage();
 				if (!usage.IsEmpty()) usage = " " + usage;
-				string output = $"{command.Key.ToUpper()}{usage}: {command.Value.GetCommandDescription()}";
+				var output = $"{command.Key.ToUpper()}{usage}: {command.Value.GetCommandDescription()}";
 				helpOutput.Add(output);
 			}
 
 			helpOutput.Sort();
 
-			foreach (string line in helpOutput) Server.Write(line, ConsoleColor.Green);
+			foreach (var line in helpOutput) Server.Write(line, ConsoleColor.Green.ToColor());
 
 			Server.Write("Commands from game:");
 		}

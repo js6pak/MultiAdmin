@@ -54,7 +54,7 @@ namespace MultiAdmin.Tests.Utility
 		[Fact]
 		public void GetFullPathSafeTest()
 		{
-			string result = Utils.GetFullPathSafe(" ");
+			var result = Utils.GetFullPathSafe(" ");
 			Assert.Null(result);
 		}
 
@@ -76,13 +76,13 @@ namespace MultiAdmin.Tests.Utility
 				new StringMatchingTemplate("sizetest", "sizetest1", false)
 			};
 
-			for (int i = 0; i < matchTests.Length; i++)
+			for (var i = 0; i < matchTests.Length; i++)
 			{
 				try
 				{
-					StringMatchingTemplate test = matchTests[i];
+					var test = matchTests[i];
 
-					bool result = Utils.StringMatches(test.input, test.pattern);
+					var result = Utils.StringMatches(test.input, test.pattern);
 
 					Assert.True(test.expectedResult == result, $"Failed on test index {i}: Expected \"{test.expectedResult}\", got \"{result}\"");
 				}
@@ -117,11 +117,11 @@ namespace MultiAdmin.Tests.Utility
 				new CompareVersionTemplate("5.18", "5.18.0", -1) // The first version is shorter, so it's lower
 			};
 
-			for (int i = 0; i < versionTests.Length; i++)
+			for (var i = 0; i < versionTests.Length; i++)
 			{
-				CompareVersionTemplate test = versionTests[i];
+				var test = versionTests[i];
 
-				int result = Utils.CompareVersionStrings(test.firstVersion, test.secondVersion);
+				var result = Utils.CompareVersionStrings(test.firstVersion, test.secondVersion);
 
 				Assert.True(test.CheckResult(result), $"Failed on test index {i}: Expected \"{test.expectedResult}\", got \"{result}\"");
 			}

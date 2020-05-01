@@ -1,7 +1,9 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Text;
+using Pastel;
 
 namespace MultiAdmin.ConsoleTools
 {
@@ -9,36 +11,23 @@ namespace MultiAdmin.ConsoleTools
 	{
 		public static readonly object WriteLock = new object();
 
-		public static void Write(string text, ConsoleColor? textColor = null, ConsoleColor? backgroundColor = null)
+		public static void Write(string text, Color? textColor = null, Color? backgroundColor = null)
 		{
 			lock (WriteLock)
 			{
 				if (text == null) return;
 
-				ConsoleColor? lastFore = null;
-				if (textColor != null)
-				{
-					lastFore = Console.ForegroundColor;
-					Console.ForegroundColor = textColor.Value;
-				}
+				if (textColor.HasValue)
+					text = text.Pastel(textColor.Value);
 
-				ConsoleColor? lastBack = null;
-				if (backgroundColor != null)
-				{
-					lastBack = Console.BackgroundColor;
-					Console.BackgroundColor = backgroundColor.Value;
-				}
+				if (backgroundColor.HasValue)
+					text = text.PastelBg(backgroundColor.Value);
 
 				Console.Write(text);
-
-				if (lastFore != null)
-					Console.ForegroundColor = lastFore.Value;
-				if (lastBack != null)
-					Console.BackgroundColor = lastBack.Value;
 			}
 		}
 
-		public static void WriteLine(string text, ConsoleColor? textColor = null, ConsoleColor? backgroundColor = null)
+		public static void WriteLine(string text, Color? textColor = null, Color? backgroundColor = null)
 		{
 			lock (WriteLock)
 			{
@@ -52,7 +41,7 @@ namespace MultiAdmin.ConsoleTools
 		{
 			lock (WriteLock)
 			{
-				foreach (ColoredMessage coloredMessage in message)
+				foreach (var coloredMessage in message)
 				{
 					if (coloredMessage != null)
 						Write(coloredMessage.text, coloredMessage.textColor, coloredMessage.backgroundColor);
@@ -74,7 +63,7 @@ namespace MultiAdmin.ConsoleTools
 		{
 			lock (WriteLock)
 			{
-				foreach (ColoredMessage coloredMessage in message) WriteLine(coloredMessage);
+				foreach (var coloredMessage in message) WriteLine(coloredMessage);
 			}
 		}
 	}
@@ -82,12 +71,12 @@ namespace MultiAdmin.ConsoleTools
 	public class ColoredMessage : ICloneable
 	{
 		public string text;
-		public ConsoleColor? textColor;
-		public ConsoleColor? backgroundColor;
+		public Color? textColor;
+		public Color? backgroundColor;
 
 		public int Length => text?.Length ?? 0;
 
-		public ColoredMessage(string text, ConsoleColor? textColor = null, ConsoleColor? backgroundColor = null)
+		public ColoredMessage(string text, Color? textColor = null, Color? backgroundColor = null)
 		{
 			this.text = text;
 			this.textColor = textColor;
@@ -123,7 +112,7 @@ namespace MultiAdmin.ConsoleTools
 		{
 			unchecked
 			{
-				int hashCode = text != null ? text.GetHashCode() : 0;
+				var hashCode = text != null ? text.GetHashCode() : 0;
 				hashCode = (hashCode * 397) ^ textColor.GetHashCode();
 				hashCode = (hashCode * 397) ^ backgroundColor.GetHashCode();
 				return hashCode;
@@ -182,9 +171,9 @@ namespace MultiAdmin.ConsoleTools
 	{
 		private static string JoinTextIgnoreNull(IEnumerable<object> objects)
 		{
-			StringBuilder builder = new StringBuilder(string.Empty);
+			var builder = new StringBuilder(string.Empty);
 
-			foreach (object o in objects)
+			foreach (var o in objects)
 			{
 				if (o != null)
 					builder.Append(o);
@@ -202,7 +191,9 @@ namespace MultiAdmin.ConsoleTools
 		{
 			lock (ColoredConsole.WriteLock)
 			{
-				ColoredConsole.Write(clearConsoleLine ? ConsoleUtils.ClearConsoleLine(message.ToArray()) : message.ToArray());
+				ColoredConsole.Write(clearConsoleLine
+					? ConsoleUtils.ClearConsoleLine(message.ToArray())
+					: message.ToArray());
 			}
 		}
 
@@ -210,7 +201,9 @@ namespace MultiAdmin.ConsoleTools
 		{
 			lock (ColoredConsole.WriteLock)
 			{
-				ColoredConsole.WriteLine(clearConsoleLine ? ConsoleUtils.ClearConsoleLine(message.ToArray()) : message.ToArray());
+				ColoredConsole.WriteLine(clearConsoleLine
+					? ConsoleUtils.ClearConsoleLine(message.ToArray())
+					: message.ToArray());
 			}
 		}
 
@@ -218,8 +211,36 @@ namespace MultiAdmin.ConsoleTools
 		{
 			lock (ColoredConsole.WriteLock)
 			{
-				ColoredConsole.WriteLines(clearConsoleLine ? ConsoleUtils.ClearConsoleLine(message.ToArray()) : message.ToArray());
+				ColoredConsole.WriteLines(clearConsoleLine
+					? ConsoleUtils.ClearConsoleLine(message.ToArray())
+					: message.ToArray());
 			}
+		}
+	}
+
+	public static class ColorExtensions
+	{
+		public static Color ToColor(this ConsoleColor c)
+		{
+			int[] cColors = {
+					0x0c0c0c, //Black = 0
+					0x0037da, //DarkBlue = 1
+					0x13a10e, //DarkGreen = 2
+					0x3a96dd, //DarkCyan = 3
+					0xc50f1f, //DarkRed = 4
+					0x881798, //DarkMagenta = 5
+					0xc19c00, //DarkYellow = 6
+					0xcccccc, //Gray = 7
+					0x767676, //DarkGray = 8
+					0x3b78ff, //Blue = 9
+					0x16c60c, //Green = 10
+					0x61d6d6, //Cyan = 11
+					0xe74856, //Red = 12
+					0xb4009e, //Magenta = 13
+					0xf9f1a5, //Yellow = 14
+					0xf2f2f2  //White = 15
+				};
+			return Color.FromArgb(cColors[(int)c]);
 		}
 	}
 }

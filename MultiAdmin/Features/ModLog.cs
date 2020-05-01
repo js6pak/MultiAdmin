@@ -21,7 +21,7 @@ namespace MultiAdmin.Features
 			{
 				Directory.CreateDirectory(Server.logDir);
 
-				using (StreamWriter sw = File.AppendText(Server.ModLogFile))
+				using (var sw = File.AppendText(Server.ModLogFile))
 				{
 					message = Utils.TimeStampMessage(message);
 					sw.WriteLine(message);

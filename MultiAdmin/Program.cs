@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -15,8 +16,10 @@ namespace MultiAdmin
 {
 	public static class Program
 	{
+		public const string Name = "MultiAdmin+";
 		public const string MaVersion = "3.3.0.0";
 		public const string RecommendedMonoVersion = "5.18";
+		public const string Title = Name + " " + MaVersion;
 
 		private static readonly List<Server> InstantiatedServers = new List<Server>();
 
@@ -36,7 +39,7 @@ namespace MultiAdmin
 		{
 			get
 			{
-				string globalServersFolder = MultiAdminConfig.GlobalConfig.ServersFolder.Value;
+				var globalServersFolder = MultiAdminConfig.GlobalConfig.ServersFolder.Value;
 				return !Directory.Exists(globalServersFolder) ? new string[] { } : Directory.GetDirectories(globalServersFolder);
 			}
 		}
@@ -59,8 +62,9 @@ namespace MultiAdmin
 
 		#region Output Printing & Logging
 
-		public static void Write(string message, ConsoleColor color = ConsoleColor.DarkYellow)
+		public static void Write(string message, Color color = default)
 		{
+			color = color == default ? ConsoleColor.DarkYellow.ToColor() : color;
 			lock (ColoredConsole.WriteLock)
 			{
 				if (Headless) return;
@@ -94,7 +98,7 @@ namespace MultiAdmin
 
 					Directory.CreateDirectory(MaDebugLogDir);
 
-					using (StreamWriter sw = File.AppendText(MaDebugLogFile))
+					using (var sw = File.AppendText(MaDebugLogFile))
 					{
 						message = Utils.TimeStampMessage($"[{tag}] {message}");
 						sw.Write(message);
@@ -103,7 +107,7 @@ namespace MultiAdmin
 				}
 				catch (Exception e)
 				{
-					new ColoredMessage[] {new ColoredMessage("Error while logging for MultiAdmin debug:", ConsoleColor.Red), new ColoredMessage(e.ToString(), ConsoleColor.Red)}.WriteLines();
+					new ColoredMessage[] {new ColoredMessage("Error while logging for MultiAdmin debug:", ConsoleColor.Red.ToColor()), new ColoredMessage(e.ToString(), ConsoleColor.Red.ToColor())}.WriteLines();
 				}
 			}
 		}
@@ -116,9 +120,9 @@ namespace MultiAdmin
 			{
 				if (MultiAdminConfig.GlobalConfig.SafeServerShutdown.Value)
 				{
-					Write("Stopping servers and exiting MultiAdmin...", ConsoleColor.DarkMagenta);
+					Write("Stopping servers and exiting MultiAdmin...", ConsoleColor.DarkMagenta.ToColor());
 
-					foreach (Server server in InstantiatedServers)
+					foreach (var server in InstantiatedServers)
 					{
 						if (!server.IsGameProcessRunning)
 							continue;
@@ -126,13 +130,13 @@ namespace MultiAdmin
 						try
 						{
 							if (!string.IsNullOrEmpty(server.serverId))
-								Write($"Stopping server with ID \"{server.serverId}\"...", ConsoleColor.DarkMagenta);
+								Write($"Stopping server with ID \"{server.serverId}\"...", ConsoleColor.DarkMagenta.ToColor());
 
 							server.StopServer();
 
 							// Wait for server to exit
-							int timeToWait = Math.Max(MultiAdminConfig.GlobalConfig.SafeShutdownCheckDelay.Value, 0);
-							int timeWaited = 0;
+							var timeToWait = Math.Max(MultiAdminConfig.GlobalConfig.SafeShutdownCheckDelay.Value, 0);
+							var timeWaited = 0;
 
 							while (server.IsGameProcessRunning)
 							{
@@ -141,7 +145,7 @@ namespace MultiAdmin
 
 								if (timeWaited >= MultiAdminConfig.GlobalConfig.SafeShutdownTimeout.Value)
 								{
-									Write($"Failed to server with ID \"{server.serverId}\" within {timeWaited} ms, giving up...", ConsoleColor.Red);
+									Write($"Failed to server with ID \"{server.serverId}\" within {timeWaited} ms, giving up...", ConsoleColor.Red.ToColor());
 									break;
 								}
 							}
@@ -180,9 +184,9 @@ namespace MultiAdmin
 			if (!Headless)
 				CheckMonoVersion();
 
-			string serverIdArg = GetParamFromArgs("server-id", "id");
-			string configArg = GetParamFromArgs("config", "c");
-			portArg = uint.TryParse(GetParamFromArgs("port", "p"), out uint port) ? (uint?)port : null;
+			var serverIdArg = GetParamFromArgs("server-id", "id");
+			var configArg = GetParamFromArgs("config", "c");
+			portArg = uint.TryParse(GetParamFromArgs("port", "p"), out var port) ? (uint?)port : null;
 
 			Server server = null;
 
@@ -202,7 +206,7 @@ namespace MultiAdmin
 				}
 				else
 				{
-					Server[] autoStartServers = AutoStartServers;
+					var autoStartServers = AutoStartServers;
 
 					if (autoStartServers.IsEmpty())
 					{
@@ -217,7 +221,7 @@ namespace MultiAdmin
 					{
 						Write("Starting this instance in multi server mode...");
 
-						for (int i = 0; i < autoStartServers.Length; i++)
+						for (var i = 0; i < autoStartServers.Length; i++)
 						{
 							if (i == 0)
 							{
@@ -254,16 +258,16 @@ namespace MultiAdmin
 
 		public static string GetParamFromArgs(string[] keys = null, string[] aliases = null)
 		{
-			bool hasKeys = !keys.IsNullOrEmpty();
-			bool hasAliases = !aliases.IsNullOrEmpty();
+			var hasKeys = !keys.IsNullOrEmpty();
+			var hasAliases = !aliases.IsNullOrEmpty();
 
 			if (!hasKeys && !hasAliases) return null;
 
-			string[] args = Environment.GetCommandLineArgs();
+			var args = Environment.GetCommandLineArgs();
 
-			for (int i = 0; i < args.Length - 1; i++)
+			for (var i = 0; i < args.Length - 1; i++)
 			{
-				string lowArg = args[i]?.ToLower();
+				var lowArg = args[i]?.ToLower();
 
 				if (string.IsNullOrEmpty(lowArg)) continue;
 
@@ -289,9 +293,9 @@ namespace MultiAdmin
 
 		public static bool ArgsContainsParam(string[] keys = null, string[] aliases = null)
 		{
-			foreach (string arg in Environment.GetCommandLineArgs())
+			foreach (var arg in Environment.GetCommandLineArgs())
 			{
-				string lowArg = arg?.ToLower();
+				var lowArg = arg?.ToLower();
 
 				if (string.IsNullOrEmpty(lowArg)) continue;
 
@@ -319,7 +323,7 @@ namespace MultiAdmin
 		{
 			if (keys.IsNullOrEmpty() && aliases.IsNullOrEmpty()) return false;
 
-			return bool.TryParse(GetParamFromArgs(keys, aliases), out bool result) ? result : ArgsContainsParam(keys, aliases);
+			return bool.TryParse(GetParamFromArgs(keys, aliases), out var result) ? result : ArgsContainsParam(keys, aliases);
 		}
 
 		public static string GetParamFromArgs(string key = null, string alias = null)
@@ -339,14 +343,14 @@ namespace MultiAdmin
 
 		public static Process StartServer(Server server)
 		{
-			string assemblyLocation = Assembly.GetEntryAssembly()?.Location;
+			var assemblyLocation = Assembly.GetEntryAssembly()?.Location;
 
 			if (string.IsNullOrEmpty(assemblyLocation))
 			{
-				Write("Error while starting new server: Could not find the executable location!", ConsoleColor.Red);
+				Write("Error while starting new server: Could not find the executable location!", ConsoleColor.Red.ToColor());
 			}
 
-			List<string> args = new List<string>();
+			var args = new List<string>();
 
 			if (!string.IsNullOrEmpty(server.serverId))
 				args.Add($"-id \"{server.serverId}\"");
@@ -359,13 +363,13 @@ namespace MultiAdmin
 
 			args.RemoveAll(string.IsNullOrEmpty);
 
-			string stringArgs = string.Join(" ", args);
+			var stringArgs = string.Join(" ", args);
 
-			ProcessStartInfo startInfo = new ProcessStartInfo(assemblyLocation, stringArgs);
+			var startInfo = new ProcessStartInfo(assemblyLocation, stringArgs);
 
 			Write($"Launching \"{startInfo.FileName}\" with arguments \"{startInfo.Arguments}\"...");
 
-			Process serverProcess = Process.Start(startInfo);
+			var serverProcess = Process.Start(startInfo);
 
 			InstantiatedServers.Add(server);
 
@@ -374,7 +378,7 @@ namespace MultiAdmin
 
 		private static bool IsVersionFormat(string input, char separator = '.')
 		{
-			foreach (char character in input)
+			foreach (var character in input)
 			{
 				if (!char.IsNumber(character) && character != separator)
 					return false;
@@ -387,19 +391,19 @@ namespace MultiAdmin
 		{
 			try
 			{
-				string monoVersionRaw = Type.GetType("Mono.Runtime")?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static)?.Invoke(null, null)?.ToString();
-				string monoVersion = monoVersionRaw?.Split(' ').FirstOrDefault(version => IsVersionFormat(version));
+				var monoVersionRaw = Type.GetType("Mono.Runtime")?.GetMethod("GetDisplayName", BindingFlags.NonPublic | BindingFlags.Static)?.Invoke(null, null)?.ToString();
+				var monoVersion = monoVersionRaw?.Split(' ').FirstOrDefault(version => IsVersionFormat(version));
 
 				if (string.IsNullOrEmpty(monoVersion))
 					return;
 
-				int versionDifference = Utils.CompareVersionStrings(monoVersion, RecommendedMonoVersion);
+				var versionDifference = Utils.CompareVersionStrings(monoVersion, RecommendedMonoVersion);
 
 				if (versionDifference >= 0)
 					return;
 
-				Write($"Warning: Your Mono version ({monoVersion}) is below the minimum recommended version ({RecommendedMonoVersion})", ConsoleColor.Red);
-				Write("Please update your Mono installation: https://www.mono-project.com/download/stable/", ConsoleColor.Red);
+				Write($"Warning: Your Mono version ({monoVersion}) is below the minimum recommended version ({RecommendedMonoVersion})", ConsoleColor.Red.ToColor());
+				Write("Please update your Mono installation: https://www.mono-project.com/download/stable/", ConsoleColor.Red.ToColor());
 			}
 			catch (Exception e)
 			{

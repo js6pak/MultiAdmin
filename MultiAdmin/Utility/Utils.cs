@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using MultiAdmin.ConsoleTools;
@@ -13,7 +14,7 @@ namespace MultiAdmin.Utility
 		{
 			get
 			{
-				DateTime now = System.DateTime.Now;
+				var now = System.DateTime.Now;
 				return $"[{now.Hour:00}:{now.Minute:00}:{now.Second:00}]";
 			}
 		}
@@ -31,20 +32,20 @@ namespace MultiAdmin.Utility
 			return string.IsNullOrEmpty(message) ? message : $"{TimeStamp} {message}";
 		}
 
-		public static ColoredMessage[] TimeStampMessage(ColoredMessage[] message, ConsoleColor? color = null)
+		public static ColoredMessage[] TimeStampMessage(ColoredMessage[] message, Color? color = null)
 		{
 			if (message == null) return null;
 
-			ColoredMessage[] newMessage = new ColoredMessage[message.Length + 1];
+			var newMessage = new ColoredMessage[message.Length + 1];
 			newMessage[0] = new ColoredMessage($"{TimeStamp} ", color);
 
-			for (int i = 0; i < message.Length; i++)
+			for (var i = 0; i < message.Length; i++)
 				newMessage[i + 1] = message[i]?.Clone();
 
 			return newMessage;
 		}
 
-		public static ColoredMessage[] TimeStampMessage(ColoredMessage message, ConsoleColor? color = null)
+		public static ColoredMessage[] TimeStampMessage(ColoredMessage message, Color? color = null)
 		{
 			return TimeStampMessage(new ColoredMessage[] {message}, color);
 		}
@@ -76,10 +77,10 @@ namespace MultiAdmin.Utility
 			if (input.IsEmpty() || pattern.IsEmpty())
 				return false;
 
-			string[] wildCardSections = pattern.Split(wildCard);
+			var wildCardSections = pattern.Split(wildCard);
 
-			int matchIndex = 0;
-			foreach (string wildCardSection in wildCardSections)
+			var matchIndex = 0;
+			foreach (var wildCardSection in wildCardSections)
 			{
 				// If there's a wildcard with nothing on the other side
 				if (wildCardSection.IsEmpty())
@@ -150,7 +151,7 @@ namespace MultiAdmin.Utility
 			Directory.CreateDirectory(target.FullName);
 
 			// Copy each file
-			foreach (FileInfo file in source.GetFiles())
+			foreach (var file in source.GetFiles())
 			{
 				if (PassesWhitelistAndBlacklist(file.Name, fileWhitelist, fileBlacklist))
 				{
@@ -159,7 +160,7 @@ namespace MultiAdmin.Utility
 			}
 
 			// Copy each sub-directory using recursion
-			foreach (DirectoryInfo sourceSubDir in source.GetDirectories())
+			foreach (var sourceSubDir in source.GetDirectories())
 			{
 				if (PassesWhitelistAndBlacklist(sourceSubDir.Name, fileWhitelist, fileBlacklist))
 				{
@@ -178,11 +179,11 @@ namespace MultiAdmin.Utility
 		{
 			lock (stringArray)
 			{
-				int[] intArray = new int[stringArray.Length];
+				var intArray = new int[stringArray.Length];
 
-				for (int i = 0; i < stringArray.Length; i++)
+				for (var i = 0; i < stringArray.Length; i++)
 				{
-					if (!int.TryParse(stringArray[i], out int intValue))
+					if (!int.TryParse(stringArray[i], out var intValue))
 						continue;
 
 					intArray[i] = intValue;
@@ -208,12 +209,12 @@ namespace MultiAdmin.Utility
 			if (firstVersion == null || secondVersion == null)
 				return -1;
 
-			int[] firstVersionNums = StringArrayToIntArray(firstVersion.Split(separator));
-			int[] secondVersionNums = StringArrayToIntArray(secondVersion.Split(separator));
-			int minVersionLength = Math.Min(firstVersionNums.Length, secondVersionNums.Length);
+			var firstVersionNums = StringArrayToIntArray(firstVersion.Split(separator));
+			var secondVersionNums = StringArrayToIntArray(secondVersion.Split(separator));
+			var minVersionLength = Math.Min(firstVersionNums.Length, secondVersionNums.Length);
 
 			// Compare version numbers
-			for (int i = 0; i < minVersionLength; i++)
+			for (var i = 0; i < minVersionLength; i++)
 			{
 				if (firstVersionNums[i] > secondVersionNums[i])
 				{

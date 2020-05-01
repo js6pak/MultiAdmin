@@ -1,5 +1,6 @@
 using System;
 using System.Reflection;
+using MultiAdmin.ConsoleTools;
 using MultiAdmin.Features.Attributes;
 
 namespace MultiAdmin.Features
@@ -51,7 +52,7 @@ namespace MultiAdmin.Features
 
 		public void PrintInfo()
 		{
-			Server.Write($"{Assembly.GetExecutingAssembly().GetCustomAttribute<AssemblyTitleAttribute>().Title} (https://github.com/js6pak/MultiAdmin/)\nReleased under MIT License and forked by js6pak", ConsoleColor.DarkMagenta);
+			Server.Write($"{Program.Title} (https://github.com/js6pak/MultiAdminPlus/)\nReleased under MIT License and forked by js6pak", ConsoleColor.DarkMagenta.ToColor());
 		}
 
 		public override string GetFeatureDescription()

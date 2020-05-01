@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.IO;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -15,16 +16,17 @@ namespace MultiAdmin.ServerIO
 		private readonly FileSystemWatcher fsWatcher;
 		private bool fixBuggedPlayers;
 
-		public static ConsoleColor MapConsoleColor(string color, ConsoleColor def = ConsoleColor.Cyan)
+		public static Color MapColor(string color, Color? def = null)
 		{
+			def ??= ConsoleColor.Cyan.ToColor();
 			try
 			{
-				return (ConsoleColor)Enum.Parse(typeof(ConsoleColor), color);
+				return ((ConsoleColor)Enum.Parse(typeof(ConsoleColor), color)).ToColor();
 			}
 			catch (Exception e)
 			{
-				Program.LogDebugException(nameof(MapConsoleColor), e);
-				return def;
+				Program.LogDebugException(nameof(MapColor), e);
+				return def.Value;
 			}
 		}
 
@@ -32,17 +34,17 @@ namespace MultiAdmin.ServerIO
 		{
 			if (server == null)
 			{
-				Program.Write("Error in OutputHandler - Server server is null!", ConsoleColor.Red);
+				Program.Write("Error in OutputHandler - Server server is null!", ConsoleColor.Red.ToColor());
 				return;
 			}
 
 			if (string.IsNullOrEmpty(server.SessionDirectory))
 			{
-				server.Write($"Missing session directory! Output is not being watched... (SessionDirectory = \"{server.SessionDirectory ?? "null"}\" SessionId = \"{server.SessionId ?? "null"}\" DedicatedDir = \"{Server.DedicatedDir ?? "null"}\")", ConsoleColor.Red);
+				server.Write($"Missing session directory! Output is not being watched... (SessionDirectory = \"{server.SessionDirectory ?? "null"}\" SessionId = \"{server.SessionId ?? "null"}\" DedicatedDir = \"{Server.DedicatedDir ?? "null"}\")", ConsoleColor.Red.ToColor());
 				return;
 			}
 
-			fsWatcher = new FileSystemWatcher {Path = server.SessionDirectory};
+			fsWatcher = new FileSystemWatcher { Path = server.SessionDirectory };
 
 			fsWatcher.Created += (sender, eventArgs) => OnMapiCreated(eventArgs, server);
 			fsWatcher.Filter = "sl*.mapi";
@@ -76,22 +78,22 @@ namespace MultiAdmin.ServerIO
 
 		public void ProcessFile(Server server, string file)
 		{
-			string stream = string.Empty;
-			string command = "open";
+			var stream = string.Empty;
+			var command = "open";
 
-			bool isRead = false;
+			var isRead = false;
 
 			// Lock this object to wait for this event to finish before trying to read another file
 			lock (this)
 			{
-				for (int attempts = 0; attempts < server.ServerConfig.OutputReadAttempts.Value; attempts++)
+				for (var attempts = 0; attempts < server.ServerConfig.OutputReadAttempts.Value; attempts++)
 				{
 					try
 					{
 						if (!File.Exists(file)) return;
 
 						// Lock the file to prevent it from being modified further, or read by another instance
-						using (StreamReader sr = new StreamReader(new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)))
+						using (var sr = new StreamReader(new FileStream(file, FileMode.Open, FileAccess.Read, FileShare.None)))
 						{
 							command = "read";
 							stream = sr.ReadToEnd();
@@ -124,70 +126,70 @@ namespace MultiAdmin.ServerIO
 				return;
 			}
 
-			bool display = true;
-			ConsoleColor color = ConsoleColor.Cyan;
+			var display = true;
+			var color = ConsoleColor.Cyan.ToColor();
 
 			if (stream.EndsWith(Environment.NewLine))
 				stream = stream.Substring(0, stream.Length - Environment.NewLine.Length);
 
-			int logTypeIndex = stream.IndexOf("LOGTYPE");
+			var logTypeIndex = stream.IndexOf("LOGTYPE");
 			if (logTypeIndex >= 0)
 			{
-				string type = stream.Substring(logTypeIndex).Trim();
+				var type = stream.Substring(logTypeIndex).Trim();
 				stream = stream.Substring(0, logTypeIndex).Trim();
 
 				switch (type)
 				{
 					case "LOGTYPE02":
-						color = ConsoleColor.Green;
+						color = ConsoleColor.Green.ToColor();
 						break;
 					case "LOGTYPE-8":
-						color = ConsoleColor.DarkRed;
+						color = ConsoleColor.DarkRed.ToColor();
 						break;
 					case "LOGTYPE14":
-						color = ConsoleColor.Magenta;
+						color = ConsoleColor.Magenta.ToColor();
 						break;
 					default:
-						color = ConsoleColor.Cyan;
+						color = ConsoleColor.Cyan.ToColor();
 						break;
 				}
 			}
 
 			// Smod2 loggers pretty printing
-			Match match = SmodRegex.Match(stream);
+			var match = SmodRegex.Match(stream);
 			if (match.Success)
 			{
 				if (match.Groups.Count >= 3)
 				{
-					ConsoleColor levelColor = ConsoleColor.Cyan;
-					ConsoleColor tagColor = ConsoleColor.Yellow;
-					ConsoleColor msgColor = ConsoleColor.White;
+					var levelColor = ConsoleColor.Cyan.ToColor();
+					var tagColor = ConsoleColor.Yellow.ToColor();
+					var msgColor = ConsoleColor.White.ToColor();
 					switch (match.Groups[1].Value.Trim())
 					{
 						case "DEBUG":
-							levelColor = ConsoleColor.Gray;
+							levelColor = ConsoleColor.Gray.ToColor();
 							break;
 						case "INFO":
-							levelColor = ConsoleColor.Green;
+							levelColor = ConsoleColor.Green.ToColor();
 							break;
 						case "WARN":
-							levelColor = ConsoleColor.DarkYellow;
+							levelColor = ConsoleColor.DarkYellow.ToColor();
 							break;
 						case "ERROR":
-							levelColor = ConsoleColor.Red;
-							msgColor = ConsoleColor.Red;
+							levelColor = ConsoleColor.Red.ToColor();
+							msgColor = ConsoleColor.Red.ToColor();
 							break;
 						default:
-							color = ConsoleColor.Cyan;
+							color = ConsoleColor.Cyan.ToColor();
 							break;
 					}
 
-					server.Write(new ColoredMessage[]
+					server.Write(new[]
 					{
 						new ColoredMessage($"[{match.Groups[1].Value}] ", levelColor),
 						new ColoredMessage($"{match.Groups[2].Value} ", tagColor),
 						new ColoredMessage(match.Groups[3].Value, msgColor)
-					}, ConsoleColor.Cyan);
+					});
 
 					// P.S. the format is [Info] [courtney.exampleplugin] Something interesting happened
 					// That was just an example
@@ -200,18 +202,33 @@ namespace MultiAdmin.ServerIO
 			if (stream.Contains("Mod Log:"))
 				server.ForEachHandler<IEventAdminAction>(adminAction => adminAction.OnAdminAction(stream.Replace("Mod Log:", string.Empty)));
 
+#pragma warning disable CS0618 // Type or member is obsolete
 			if (stream.Contains("ServerMod - Version"))
 			{
-				server.hasServerMod = true;
+				server.ServerMod = new ServerMod(ServerModType.ServerMod2);
 				// This should work fine with older ServerMod versions too
-				string[] streamSplit = stream.Replace("ServerMod - Version", string.Empty).Split('-');
+				var streamSplit = stream.Replace("ServerMod - Version", string.Empty).Split('-');
 
 				if (!streamSplit.IsEmpty())
 				{
-					server.serverModVersion = streamSplit[0].Trim();
-					server.serverModBuild = (streamSplit.Length > 1 ? streamSplit[1] : "A").Trim();
+					server.ServerMod.Version = Version.Parse(streamSplit[0].Trim());
+					var build = (streamSplit.Length > 1 ? streamSplit[1] : "A").Trim();
+					server.ServerMod.Type = build switch
+					{
+						"PluginLoaderSL" => ServerModType.PluginLoaderSL,
+						"EXILED" => ServerModType.EXILED,
+						_ => server.ServerMod.Type
+					};
 				}
+
+				server.Write(new[]
+				{
+					new ColoredMessage("Detected server mod: ", ConsoleColor.Green.ToColor()),
+					new ColoredMessage(server.ServerMod.ToString(), ConsoleColor.White.ToColor())
+				});
+				return;
 			}
+#pragma warning restore CS0618 // Type or member is obsolete
 
 			if (stream.Contains("Round restarting"))
 				server.ForEachHandler<IEventRoundEnd>(roundEnd => roundEnd.OnRoundEnd());
@@ -243,10 +260,10 @@ namespace MultiAdmin.ServerIO
 				display = false;
 				server.Log("Player connect event");
 
-				int index = stream.IndexOf(":");
+				var index = stream.IndexOf(":");
 				if (index >= 0)
 				{
-					string name = stream.Substring(index);
+					var name = stream.Substring(index);
 					server.ForEachHandler<IEventPlayerConnect>(playerConnect => playerConnect.OnPlayerConnect(name));
 				}
 			}
@@ -256,10 +273,10 @@ namespace MultiAdmin.ServerIO
 				display = false;
 				server.Log("Player disconnect event");
 
-				int index = stream.IndexOf(":");
+				var index = stream.IndexOf(":");
 				if (index >= 0)
 				{
-					string name = stream.Substring(index);
+					var name = stream.Substring(index);
 					server.ForEachHandler<IEventPlayerDisconnect>(playerDisconnect => playerDisconnect.OnPlayerDisconnect(name));
 				}
 			}
@@ -267,7 +284,7 @@ namespace MultiAdmin.ServerIO
 			if (stream.Contains("Player has connected before load is complete"))
 				fixBuggedPlayers = true;
 
-			if (display) server.Write(stream, color);
+			if (display) server.Write(UnityRichTextParser.Parse(stream, color));
 		}
 
 		public void Dispose()

@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -195,13 +196,13 @@ namespace MultiAdmin.Config
 				}
 				catch (Exception e)
 				{
-					new ColoredMessage[] {new ColoredMessage($"Error while creating config (Path = {Config?.ConfigPath ?? "Null"}):", ConsoleColor.Red), new ColoredMessage(e.ToString(), ConsoleColor.Red)}.WriteLines();
+					new ColoredMessage[] {new ColoredMessage($"Error while creating config (Path = {Config?.ConfigPath ?? "Null"}):", ConsoleColor.Red.ToColor()), new ColoredMessage(e.ToString(), ConsoleColor.Red.ToColor()) }.WriteLines();
 				}
 			}
 
 			#region MultiAdmin Config Register
 
-			foreach (PropertyInfo property in GetType().GetProperties())
+			foreach (var property in GetType().GetProperties())
 			{
 				if (property.GetValue(this) is ConfigEntry entry)
 				{
@@ -323,9 +324,9 @@ namespace MultiAdmin.Config
 
 		public MultiAdminConfig[] GetConfigHierarchy(bool highestToLowest = true)
 		{
-			List<MultiAdminConfig> configHierarchy = new List<MultiAdminConfig>();
+			var configHierarchy = new List<MultiAdminConfig>();
 
-			foreach (ConfigRegister configRegister in GetConfigRegisterHierarchy(highestToLowest))
+			foreach (var configRegister in GetConfigRegisterHierarchy(highestToLowest))
 			{
 				if (configRegister is MultiAdminConfig config)
 					configHierarchy.Add(config);
@@ -336,7 +337,7 @@ namespace MultiAdmin.Config
 
 		public bool ConfigHierarchyContainsPath(string path)
 		{
-			string fullPath = Utils.GetFullPathSafe(path);
+			var fullPath = Utils.GetFullPathSafe(path);
 
 			return !string.IsNullOrEmpty(fullPath) && GetConfigHierarchy().Any(config => config.Config?.ConfigPath == path);
 		}

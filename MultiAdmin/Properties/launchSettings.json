@@ -1,0 +1,12 @@
+{
+  "profiles": {
+    "PluginLoaderSL": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\SCPSL"
+    },
+    "EXILED": {
+      "commandName": "Project",
+      "workingDirectory": "D:\\EXILED"
+    }
+  }
+}

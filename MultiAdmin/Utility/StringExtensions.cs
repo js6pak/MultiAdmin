@@ -13,9 +13,9 @@ namespace MultiAdmin.Utility
 			if (count < 0 || startIndex > input.Length - count)
 				throw new ArgumentOutOfRangeException(nameof(count));
 
-			for (int i = 0; i < count; i++)
+			for (var i = 0; i < count; i++)
 			{
-				int curIndex = startIndex + i;
+				var curIndex = startIndex + i;
 
 				if (input[curIndex] != value[i])
 					return false;

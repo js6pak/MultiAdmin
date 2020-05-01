@@ -22,7 +22,7 @@ namespace MultiAdmin.Features
 			}
 			else
 			{
-				string serverId = string.Join(" ", args);
+				var serverId = string.Join(" ", args);
 
 				if (string.IsNullOrEmpty(serverId)) return;
 

@@ -20,18 +20,18 @@ namespace MultiAdmin.ConsoleTools
 
 				try
 				{
-					int cursorLeftReturnIndex = returnCursorPos ? Console.CursorLeft : 0;
+					var cursorLeftReturnIndex = returnCursorPos ? Console.CursorLeft : 0;
 					// Linux console uses visible section as a scrolling buffer,
 					// that means that making the console taller moves CursorTop to a higher index,
 					// but when the user makes the console smaller, CursorTop is left at a higher index than BufferHeight,
 					// causing an error
-					int cursorTopIndex = Math.Min(Console.CursorTop, Console.BufferHeight - 1);
+					var cursorTopIndex = Math.Min(Console.CursorTop, Console.BufferHeight - 1);
 
 					Console.SetCursorPosition(IsIndexWithinBuffer(index) ? index : 0, cursorTopIndex);
 
 					// If the message stretches to the end of the console window, the console window will generally wrap the line into a new line,
 					// so 1 is subtracted
-					int charCount = Console.BufferWidth - Console.CursorLeft - 1;
+					var charCount = Console.BufferWidth - Console.CursorLeft - 1;
 					if (charCount > 0)
 					{
 						Console.Write(new string(' ', charCount));

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -31,10 +32,7 @@ namespace MultiAdmin
 		public readonly string serverDir;
 		public readonly string logDir;
 
-		public bool hasServerMod;
-
-		public string serverModBuild;
-		public string serverModVersion;
+		public ServerMod ServerMod { get; set; }
 
 		private int logId;
 
@@ -52,7 +50,7 @@ namespace MultiAdmin
 			serverConfig = MultiAdminConfig.GlobalConfig;
 
 			// Load config hierarchy
-			string serverConfigLocation = this.configLocation;
+			var serverConfigLocation = this.configLocation;
 			while (!string.IsNullOrEmpty(serverConfigLocation))
 			{
 				// Update the Server object's config location with the valid config location
@@ -175,13 +173,13 @@ namespace MultiAdmin
 
 		private void MainLoop()
 		{
-			Stopwatch timer = new Stopwatch();
+			var timer = new Stopwatch();
 			while (IsGameProcessRunning)
 			{
 				timer.Reset();
 				timer.Start();
 
-				foreach (IEventTick tickEvent in tick) tickEvent.OnTick();
+				foreach (var tickEvent in tick) tickEvent.OnTick();
 
 				timer.Stop();
 
@@ -190,20 +188,20 @@ namespace MultiAdmin
 
 				if (Status == ServerStatus.Restarting && CheckRestartTimeout)
 				{
-					Write("Server restart timed out, killing the server process...", ConsoleColor.Red);
+					Write("Server restart timed out, killing the server process...", ConsoleColor.Red.ToColor());
 					if (IsGameProcessRunning)
 						GameProcess.Kill();
 				}
 
 				if (Status == ServerStatus.Stopping && CheckStopTimeout)
 				{
-					Write("Server exit timed out, killing the server process...", ConsoleColor.Red);
+					Write("Server exit timed out, killing the server process...", ConsoleColor.Red.ToColor());
 					StopServer(true);
 				}
 
 				if (Status == ServerStatus.ForceStopping)
 				{
-					Write("Force stopping the server process...", ConsoleColor.Red);
+					Write("Force stopping the server process...", ConsoleColor.Red.ToColor());
 					StopServer(true);
 				}
 			}
@@ -221,7 +219,7 @@ namespace MultiAdmin
 				return;
 			}
 
-			string file = Path.Combine(SessionDirectory, $"cs{logId}.mapi");
+			var file = Path.Combine(SessionDirectory, $"cs{logId}.mapi");
 			if (File.Exists(file))
 			{
 				Write($"Send Message error: Sending {message} failed. \"{file}\" already exists!\nSkipping...");
@@ -229,11 +227,11 @@ namespace MultiAdmin
 				return;
 			}
 
-			StreamWriter streamWriter = new StreamWriter(file);
+			var streamWriter = new StreamWriter(file);
 			logId++;
 			streamWriter.WriteLine(message + "terminator");
 			streamWriter.Close();
-			Write("Sending request to SCP: Secret Laboratory...", ConsoleColor.White);
+			Write("Sending request to SCP: Secret Laboratory...", ConsoleColor.White.ToColor());
 		}
 
 		#endregion
@@ -247,7 +245,7 @@ namespace MultiAdmin
 
 			if (ServerConfig != null)
 			{
-				foreach (MultiAdminConfig config in ServerConfig.GetConfigHierarchy())
+				foreach (var config in ServerConfig.GetConfigHierarchy())
 				{
 					if (!string.IsNullOrEmpty(config?.Config?.ConfigPath) && MultiAdminConfig.GlobalConfigFilePath != config.Config.ConfigPath)
 						Write($"Using server config \"{config.Config.ConfigPath}\"...");
@@ -276,7 +274,7 @@ namespace MultiAdmin
 		{
 			if (!IsStopped) throw new Exceptions.ServerAlreadyRunningException();
 
-			bool shouldRestart = false;
+			var shouldRestart = false;
 
 			do
 			{
@@ -303,11 +301,11 @@ namespace MultiAdmin
 					// Init features
 					InitFeatures();
 
-					string scpslExe = GetExecutablePath();
+					var scpslExe = GetExecutablePath();
 
-					Write($"Executing \"{scpslExe}\"...", ConsoleColor.DarkGreen);
+					Write($"Executing \"{scpslExe}\"...", ConsoleColor.DarkGreen.ToColor());
 
-					List<string> scpslArgs = new List<string>
+					var scpslArgs = new List<string>
 					{
 						"-batchmode",
 						"-nographics",
@@ -315,7 +313,8 @@ namespace MultiAdmin
 						"-nodedicateddelete",
 						$"-key{SessionId}",
 						$"-id{Process.GetCurrentProcess().Id}",
-						$"-port{port ?? ServerConfig.Port.Value}"
+						$"-port{port ?? ServerConfig.Port.Value}",
+						$"-multiadminplus {Program.MaVersion}"
 					};
 
 					if (string.IsNullOrEmpty(ScpLogFile) || ServerConfig.NoLog.Value)
@@ -347,7 +346,7 @@ namespace MultiAdmin
 						scpslArgs.Add($"-configpath \"{configLocation}\"");
 					}
 
-					string appDataPath = Utils.GetFullPathSafe(ServerConfig.AppDataLocation.Value);
+					var appDataPath = Utils.GetFullPathSafe(ServerConfig.AppDataLocation.Value);
 					if (!string.IsNullOrEmpty(appDataPath))
 					{
 						scpslArgs.Add($"-appdatapath \"{appDataPath}\"");
@@ -355,11 +354,11 @@ namespace MultiAdmin
 
 					scpslArgs.RemoveAll(string.IsNullOrEmpty);
 
-					string argsString = string.Join(" ", scpslArgs);
+					var argsString = string.Join(" ", scpslArgs);
 
 					Write($"Starting server with the following parameters:\n{scpslExe} {argsString}");
 
-					ProcessStartInfo startInfo = new ProcessStartInfo(scpslExe, argsString)
+					var startInfo = new ProcessStartInfo(scpslExe, argsString)
 					{
 						CreateNoWindow = true,
 						UseShellExecute = false
@@ -368,13 +367,13 @@ namespace MultiAdmin
 					ForEachHandler<IEventServerPreStart>(eventPreStart => eventPreStart.OnServerPreStart());
 
 					// Start the input reader
-					Thread inputHandlerThread = new Thread(() => InputHandler.Write(this));
+					var inputHandlerThread = new Thread(() => InputHandler.Write(this));
 
 					if (!Program.Headless)
 						inputHandlerThread.Start();
 
 					// Start the output reader
-					OutputHandler outputHandler = new OutputHandler(this);
+					var outputHandler = new OutputHandler(this);
 
 					// Finally, start the game
 					GameProcess = Process.Start(startInfo);
@@ -401,7 +400,7 @@ namespace MultiAdmin
 
 							ForEachHandler<IEventCrash>(eventCrash => eventCrash.OnCrash());
 
-							Write("Game engine exited unexpectedly", ConsoleColor.Red);
+							Write("Game engine exited unexpectedly", ConsoleColor.Red.ToColor());
 
 							shouldRestart = restartOnCrash;
 							break;
@@ -428,7 +427,7 @@ namespace MultiAdmin
 				}
 				catch (Exception e)
 				{
-					Write(e.Message, ConsoleColor.Red);
+					Write(e.Message, ConsoleColor.Red.ToColor());
 					Program.LogDebugException(nameof(StartServer), e);
 
 					// If the server should try to start up again
@@ -436,20 +435,20 @@ namespace MultiAdmin
 					{
 						shouldRestart = true;
 
-						int waitDelayMs = ServerConfig.ServerStartRetryDelay.Value;
+						var waitDelayMs = ServerConfig.ServerStartRetryDelay.Value;
 						if (waitDelayMs > 0)
 						{
-							Write($"Startup failed! Waiting for {waitDelayMs} ms before retrying...", ConsoleColor.Red);
+							Write($"Startup failed! Waiting for {waitDelayMs} ms before retrying...", ConsoleColor.Red.ToColor());
 							Thread.Sleep(waitDelayMs);
 						}
 						else
 						{
-							Write("Startup failed! Retrying...", ConsoleColor.Red);
+							Write("Startup failed! Retrying...", ConsoleColor.Red.ToColor());
 						}
 					}
 					else
 					{
-						Write("Startup failed! Exiting...", ConsoleColor.Red);
+						Write("Startup failed! Exiting...", ConsoleColor.Red.ToColor());
 					}
 				}
 				finally
@@ -484,7 +483,9 @@ namespace MultiAdmin
 			initRestartTimeoutTime = DateTime.Now;
 			Status = ServerStatus.Restarting;
 
-			if (hasServerMod)
+#pragma warning disable 618
+			if (ServerMod.Type == ServerModType.ServerMod2)
+#pragma warning restore 618
 			{
 				SendMessage("RECONNECTRS");
 			}
@@ -509,12 +510,12 @@ namespace MultiAdmin
 
 				case ICommand command:
 				{
-					string commandKey = command.GetCommand().ToLower().Trim();
+					var commandKey = command.GetCommand().ToLower().Trim();
 
 					// If the command was already registered
 					if (commands.ContainsKey(commandKey))
 					{
-						string message = $"Warning, {nameof(MultiAdmin)} tried to register duplicate command \"{commandKey}\"";
+						var message = $"Warning, {nameof(MultiAdmin)} tried to register duplicate command \"{commandKey}\"";
 
 						Program.LogDebug(nameof(RegisterFeature), message);
 						Write(message);
@@ -533,11 +534,11 @@ namespace MultiAdmin
 
 		private static IEnumerable<Type> GetTypesWithAttribute(Type attribute)
 		{
-			foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+			foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
 			{
-				foreach (Type type in assembly.GetTypes())
+				foreach (var type in assembly.GetTypes())
 				{
-					object[] attributes = type.GetCustomAttributes(attribute, true);
+					var attributes = type.GetCustomAttributes(attribute, true);
 					if (!attributes.IsEmpty()) yield return type;
 				}
 			}
@@ -545,12 +546,12 @@ namespace MultiAdmin
 
 		private void RegisterFeatures()
 		{
-			Type[] assembly = GetTypesWithAttribute(typeof(FeatureAttribute)).ToArray();
-			foreach (Type type in assembly)
+			var assembly = GetTypesWithAttribute(typeof(FeatureAttribute)).ToArray();
+			foreach (var type in assembly)
 			{
 				try
 				{
-					object featureInstance = Activator.CreateInstance(type, this);
+					var featureInstance = Activator.CreateInstance(type, this);
 					if (featureInstance is Feature feature) RegisterFeature(feature);
 				}
 				catch (Exception e)
@@ -562,7 +563,7 @@ namespace MultiAdmin
 
 		private void InitFeatures()
 		{
-			foreach (Feature feature in features)
+			foreach (var feature in features)
 			{
 				feature.Init();
 				feature.OnConfigReload();
@@ -571,7 +572,7 @@ namespace MultiAdmin
 
 		public void ForEachHandler<T>(Action<T> action) where T : IMAEvent
 		{
-			foreach (Feature feature in features)
+			foreach (var feature in features)
 				if (feature is T eventHandler)
 					action.Invoke(eventHandler);
 		}
@@ -585,7 +586,7 @@ namespace MultiAdmin
 			try
 			{
 				Directory.CreateDirectory(SessionDirectory);
-				Write($"Started new session \"{SessionId}\"", ConsoleColor.DarkGreen);
+				Write($"Started new session \"{SessionId}\"", ConsoleColor.DarkGreen.ToColor());
 			}
 			catch (Exception e)
 			{
@@ -597,9 +598,9 @@ namespace MultiAdmin
 		{
 			if (!Directory.Exists(SessionDirectory)) return;
 
-			foreach (string file in Directory.GetFiles(SessionDirectory))
+			foreach (var file in Directory.GetFiles(SessionDirectory))
 			{
-				for (int i = 0; i < 20; i++)
+				for (var i = 0; i < 20; i++)
 				{
 					try
 					{
@@ -628,7 +629,7 @@ namespace MultiAdmin
 
 				if (!Directory.Exists(SessionDirectory)) return;
 
-				for (int i = 0; i < 20; i++)
+				for (var i = 0; i < 20; i++)
 				{
 					try
 					{
@@ -657,7 +658,7 @@ namespace MultiAdmin
 
 		#region Console Output and Logging
 
-		public void Write(ColoredMessage[] messages, ConsoleColor? timeStampColor = null)
+		public void Write(ColoredMessage[] messages, Color? timeStampColor = null)
 		{
 			lock (ColoredConsole.WriteLock)
 			{
@@ -667,7 +668,7 @@ namespace MultiAdmin
 
 				if (Program.Headless) return;
 
-				ColoredMessage[] timeStampedMessage = Utils.TimeStampMessage(messages, timeStampColor);
+				var timeStampedMessage = Utils.TimeStampMessage(messages, timeStampColor);
 
 				timeStampedMessage.WriteLine(ServerConfig.UseNewInputSystem.Value);
 
@@ -676,16 +677,17 @@ namespace MultiAdmin
 			}
 		}
 
-		public void Write(ColoredMessage message, ConsoleColor? timeStampColor = null)
+		public void Write(ColoredMessage message, Color? timeStampColor = null)
 		{
 			lock (ColoredConsole.WriteLock)
 			{
-				Write(new ColoredMessage[] {message}, timeStampColor ?? message.textColor);
+				Write(new[] {message}, timeStampColor ?? message.textColor);
 			}
 		}
 
-		public void Write(string message, ConsoleColor? color = ConsoleColor.Yellow, ConsoleColor? timeStampColor = null)
+		public void Write(string message, Color? color = null, Color? timeStampColor = null)
 		{
+			color ??= ConsoleColor.Yellow.ToColor();
 			lock (ColoredConsole.WriteLock)
 			{
 				Write(new ColoredMessage(message, color), timeStampColor);
@@ -702,7 +704,7 @@ namespace MultiAdmin
 				{
 					Directory.CreateDirectory(logDir);
 
-					using (StreamWriter sw = File.AppendText(MaLogFile))
+					using (var sw = File.AppendText(MaLogFile))
 					{
 						message = Utils.TimeStampMessage(message);
 						sw.Write(message);
@@ -713,7 +715,7 @@ namespace MultiAdmin
 				{
 					Program.LogDebugException(nameof(Log), e);
 
-					new ColoredMessage[] {new ColoredMessage("Error while logging for MultiAdmin:", ConsoleColor.Red), new ColoredMessage(e.ToString(), ConsoleColor.Red)}.WriteLines();
+					new ColoredMessage[] {new ColoredMessage("Error while logging for MultiAdmin:", ConsoleColor.Red.ToColor()), new ColoredMessage(e.ToString(), ConsoleColor.Red.ToColor())}.WriteLines();
 				}
 			}
 		}
@@ -722,26 +724,7 @@ namespace MultiAdmin
 
 		public bool ServerModCheck(int major, int minor, int fix)
 		{
-			if (string.IsNullOrEmpty(serverModVersion))
-				return false;
-
-			string[] parts = serverModVersion.Split('.');
-
-			if (parts.IsEmpty())
-				return false;
-
-			int.TryParse(parts[0], out int verMajor);
-
-			int verMinor = 0;
-			if (parts.Length >= 2)
-				int.TryParse(parts[1], out verMinor);
-
-			int verFix = 0;
-			if (parts.Length >= 3)
-				int.TryParse(parts[2], out verFix);
-
-			return verMajor > major || verMajor >= major && verMinor > minor ||
-			       verMajor >= major && verMinor >= minor && verFix >= fix;
+			return ServerMod.Version != null && ServerMod.Version.CompareTo(new Version(major, minor, fix)) >= 0;
 		}
 
 		public void ReloadConfig(bool copyFiles = true, bool runEvent = true)
@@ -757,7 +740,7 @@ namespace MultiAdmin
 
 			// Handle each config reload event
 			if (runEvent)
-				foreach (Feature feature in features)
+				foreach (var feature in features)
 					feature.OnConfigReload();
 		}
 
@@ -780,7 +763,7 @@ namespace MultiAdmin
 			}
 			catch (Exception e)
 			{
-				Write($"Error while copying files and folders:\n{e}", ConsoleColor.Red);
+				Write($"Error while copying files and folders:\n{e}", ConsoleColor.Red.ToColor());
 			}
 
 			return false;

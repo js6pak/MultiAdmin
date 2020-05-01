@@ -71,9 +71,9 @@ namespace MultiAdmin.Features
 		{
 			if (Program.Headless || !Server.ServerConfig.SetTitleBar.Value) return;
 
-			int displayPlayerCount = playerCount < 0 ? 0 : playerCount;
+			var displayPlayerCount = playerCount < 0 ? 0 : playerCount;
 
-			List<string> titleBar = new List<string> {$"MultiAdmin {Program.MaVersion}"};
+			var titleBar = new List<string> { Program.Title };
 
 			if (!string.IsNullOrEmpty(Server.serverId))
 			{
@@ -92,9 +92,9 @@ namespace MultiAdmin.Features
 
 			titleBar.Add($"{displayPlayerCount}/{maxPlayers}");
 
-			if (Server.hasServerMod && !string.IsNullOrEmpty(Server.serverModVersion))
+			if (Server.ServerMod != null)
 			{
-				titleBar.Add(string.IsNullOrEmpty(Server.serverModBuild) ? $"SMod {Server.serverModVersion}" : $"SMod {Server.serverModVersion}-{Server.serverModBuild}");
+				titleBar.Add(Server.ServerMod.ToString());
 			}
 
 			try

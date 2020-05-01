@@ -34,7 +34,7 @@ namespace MultiAdmin.Features
 
 			queueIndex = LoopingLimitIndex(queueIndex);
 
-			string copyFrom = queue[queueIndex];
+			var copyFrom = queue[queueIndex];
 
 			if (string.IsNullOrEmpty(copyFrom)) return;
 
@@ -60,7 +60,7 @@ namespace MultiAdmin.Features
 		{
 			if (!HasValidQueue) return 0;
 
-			Random random = new Random();
+			var random = new Random();
 
 			int index;
 			do

@@ -31,7 +31,7 @@ namespace MultiAdmin.Config.ConfigHandler
 
 			key = key.ToLower();
 
-			foreach (ConfigEntry registeredConfig in registeredConfigs)
+			foreach (var registeredConfig in registeredConfigs)
 			{
 				if (key == registeredConfig.Key.ToLower())
 					return registeredConfig;
@@ -66,7 +66,7 @@ namespace MultiAdmin.Config.ConfigHandler
 			if (configEntries == null)
 				return;
 
-			foreach (ConfigEntry configEntry in configEntries)
+			foreach (var configEntry in configEntries)
 			{
 				RegisterConfig(configEntry, updateValue);
 			}
@@ -102,7 +102,7 @@ namespace MultiAdmin.Config.ConfigHandler
 			if (configEntries == null)
 				return;
 
-			foreach (ConfigEntry configEntry in configEntries)
+			foreach (var configEntry in configEntries)
 			{
 				UnRegisterConfig(configEntry);
 			}
@@ -117,7 +117,7 @@ namespace MultiAdmin.Config.ConfigHandler
 			if (keys == null)
 				return;
 
-			foreach (string key in keys)
+			foreach (var key in keys)
 			{
 				UnRegisterConfig(key);
 			}
@@ -128,7 +128,7 @@ namespace MultiAdmin.Config.ConfigHandler
 		/// </summary>
 		public void UnRegisterConfigs()
 		{
-			foreach (ConfigEntry configEntry in registeredConfigs)
+			foreach (var configEntry in registeredConfigs)
 			{
 				UnRegisterConfig(configEntry);
 			}
@@ -149,7 +149,7 @@ namespace MultiAdmin.Config.ConfigHandler
 			if (configEntries == null)
 				return;
 
-			foreach (ConfigEntry configEntry in configEntries)
+			foreach (var configEntry in configEntries)
 			{
 				UpdateConfigValue(configEntry);
 			}
@@ -160,7 +160,7 @@ namespace MultiAdmin.Config.ConfigHandler
 		/// </summary>
 		public void UpdateRegisteredConfigValues()
 		{
-			foreach (ConfigEntry registeredConfig in registeredConfigs)
+			foreach (var registeredConfig in registeredConfigs)
 			{
 				UpdateConfigValue(registeredConfig);
 			}

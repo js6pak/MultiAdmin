@@ -47,21 +47,21 @@ namespace MultiAdmin.Tests.ServerIO
 				new FromStringTemplate("test string", new string[] {"tes..", ".t ..", ".st..", ".ring"}, 5, new ColoredMessage("."), new ColoredMessage(".."))
 			};
 
-			for (int i = 0; i < sectionTests.Length; i++)
+			for (var i = 0; i < sectionTests.Length; i++)
 			{
-				FromStringTemplate sectionTest = sectionTests[i];
+				var sectionTest = sectionTests[i];
 
-				StringSections sections = StringSections.FromString(sectionTest.testString, sectionTest.sectionLength, sectionTest.leftIndictator, sectionTest.rightIndictator);
+				var sections = StringSections.FromString(sectionTest.testString, sectionTest.sectionLength, sectionTest.leftIndictator, sectionTest.rightIndictator);
 
 				Assert.NotNull(sections);
 				Assert.NotNull(sections.Sections);
 
 				Assert.True(sections.Sections.Length == sectionTest.expectedSections.Length, $"Failed at index {i}: Expected sections length \"{sectionTest.expectedSections.Length}\", got \"{sections.Sections.Length}\"");
 
-				for (int j = 0; j < sectionTest.expectedSections.Length; j++)
+				for (var j = 0; j < sectionTest.expectedSections.Length; j++)
 				{
-					string expected = sectionTest.expectedSections[j];
-					string result = sections.Sections[j].Section.GetText();
+					var expected = sectionTest.expectedSections[j];
+					var result = sections.Sections[j].Section.GetText();
 
 					Assert.Equal(expected, result);//, $"Failed at index {i}: Failed at section index {j}: Expected section text to be \"{expected ?? "null"}\", got \"{result ?? "null"}\"");
 				}

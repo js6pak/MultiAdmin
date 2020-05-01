@@ -41,11 +41,11 @@ namespace MultiAdmin.Features
 				return;
 			}
 
-			string dir = string.Join(" ", args);
+			var dir = string.Join(" ", args);
 
-			List<string> lines = new List<string> {"# MultiAdmin", string.Empty, "## Features", string.Empty};
+			var lines = new List<string> {"# MultiAdmin", string.Empty, "## Features", string.Empty};
 
-			foreach (Feature feature in Server.features)
+			foreach (var feature in Server.features)
 			{
 				if (feature.Equals(this)) continue;
 
@@ -55,7 +55,7 @@ namespace MultiAdmin.Features
 			lines.Add(string.Empty);
 			lines.Add("## MultiAdmin Commands");
 			lines.Add(string.Empty);
-			foreach (ICommand comm in Server.commands.Values)
+			foreach (var comm in Server.commands.Values)
 			{
 				lines.Add($"- {(comm.GetCommand() + " " + comm.GetUsage()).Trim()}: {comm.GetCommandDescription()}");
 			}
@@ -66,9 +66,9 @@ namespace MultiAdmin.Features
 			lines.Add($"Config Option{ColumnSeparator}Value Type{ColumnSeparator}Default Value{ColumnSeparator}Description");
 			lines.Add($"---{ColumnSeparator}:---:{ColumnSeparator}:---:{ColumnSeparator}:------:");
 
-			foreach (ConfigEntry configEntry in MultiAdminConfig.GlobalConfig.GetRegisteredConfigs())
+			foreach (var configEntry in MultiAdminConfig.GlobalConfig.GetRegisteredConfigs())
 			{
-				StringBuilder stringBuilder = new StringBuilder($"{configEntry.Key ?? EmptyIndicator}{ColumnSeparator}");
+				var stringBuilder = new StringBuilder($"{configEntry.Key ?? EmptyIndicator}{ColumnSeparator}");
 
 				switch (configEntry)
 				{

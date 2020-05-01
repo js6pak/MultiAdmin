@@ -1,4 +1,5 @@
 using System;
+using MultiAdmin.ConsoleTools;
 using MultiAdmin.Features.Attributes;
 
 namespace MultiAdmin.Features
@@ -71,7 +72,7 @@ namespace MultiAdmin.Features
 		{
 			if (!restart || Server.Status == ServerStatus.Restarting) return;
 
-			Server.Write("Restarting due to low memory (Round End)...", ConsoleColor.Red);
+			Server.Write("Restarting due to low memory (Round End)...", ConsoleColor.Red.ToColor());
 
 			Server.SoftRestartServer();
 
@@ -85,7 +86,7 @@ namespace MultiAdmin.Features
 			if (tickCount < MaxTicks && LowBytes >= 0 && MemoryLeftBytes <= LowBytes)
 			{
 				Server.Write($"Warning: Program is running low on memory ({decimal.Round(MemoryLeftMb, OutputPrecision)} MB left), the server will restart if it continues",
-					ConsoleColor.Red);
+					ConsoleColor.Red.ToColor());
 				tickCount++;
 			}
 			else
@@ -97,7 +98,7 @@ namespace MultiAdmin.Features
 			{
 				Server.Write(
 					$"Warning: Program is running low on memory ({decimal.Round(MemoryLeftMb, OutputPrecision)} MB left), the server will restart at the end of the round if it continues",
-					ConsoleColor.Red);
+					ConsoleColor.Red.ToColor());
 				tickCountSoft++;
 			}
 			else
@@ -109,7 +110,7 @@ namespace MultiAdmin.Features
 
 			if (tickCount >= MaxTicks)
 			{
-				Server.Write("Restarting due to low memory...", ConsoleColor.Red);
+				Server.Write("Restarting due to low memory...", ConsoleColor.Red.ToColor());
 				Server.SoftRestartServer();
 
 				restart = false;

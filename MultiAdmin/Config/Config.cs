@@ -1,4 +1,5 @@
 using System;
+using System.Drawing;
 using System.IO;
 using System.Linq;
 using System.Text;
@@ -49,7 +50,7 @@ namespace MultiAdmin.Config
 			{
 				Program.LogDebugException(nameof(ReadConfigFile), e);
 
-				new ColoredMessage[] {new ColoredMessage($"Error while reading config (Path = {ConfigPath ?? "Null"}):", ConsoleColor.Red), new ColoredMessage(e.ToString(), ConsoleColor.Red)}.WriteLines();
+				new ColoredMessage[] {new ColoredMessage($"Error while reading config (Path = {ConfigPath ?? "Null"}):", ConsoleColor.Red.ToColor()), new ColoredMessage(e.ToString(), ConsoleColor.Red.ToColor())}.WriteLines();
 			}
 		}
 
@@ -67,7 +68,7 @@ namespace MultiAdmin.Config
 		{
 			if (string.IsNullOrEmpty(value)) return value;
 
-			string newValue = value.Trim();
+			var newValue = value.Trim();
 
 			try
 			{
@@ -86,7 +87,7 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				foreach (string line in rawData)
+				foreach (var line in rawData)
 				{
 					if (!line.ToLower().StartsWith(key.ToLower() + ":")) continue;
 
@@ -112,7 +113,7 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				foreach (string line in rawData)
+				foreach (var line in rawData)
 				{
 					if (!line.ToLower().StartsWith(key.ToLower() + ":")) continue;
 
@@ -138,9 +139,9 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				string value = GetString(key);
+				var value = GetString(key);
 
-				if (!string.IsNullOrEmpty(value) && int.TryParse(value, out int parseValue))
+				if (!string.IsNullOrEmpty(value) && int.TryParse(value, out var parseValue))
 					return parseValue;
 			}
 			catch (Exception e)
@@ -155,9 +156,9 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				string value = GetString(key);
+				var value = GetString(key);
 
-				if (!string.IsNullOrEmpty(value) && uint.TryParse(value, out uint parseValue))
+				if (!string.IsNullOrEmpty(value) && uint.TryParse(value, out var parseValue))
 					return parseValue;
 			}
 			catch (Exception e)
@@ -172,9 +173,9 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				string value = GetString(key);
+				var value = GetString(key);
 
-				if (!string.IsNullOrEmpty(value) && float.TryParse(value, out float parsedValue))
+				if (!string.IsNullOrEmpty(value) && float.TryParse(value, out var parsedValue))
 					return parsedValue;
 			}
 			catch (Exception e)
@@ -189,9 +190,9 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				string value = GetString(key);
+				var value = GetString(key);
 
-				if (!string.IsNullOrEmpty(value) && double.TryParse(value, out double parsedValue))
+				if (!string.IsNullOrEmpty(value) && double.TryParse(value, out var parsedValue))
 					return parsedValue;
 			}
 			catch (Exception e)
@@ -206,9 +207,9 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				string value = GetString(key);
+				var value = GetString(key);
 
-				if (!string.IsNullOrEmpty(value) && decimal.TryParse(value, out decimal parsedValue))
+				if (!string.IsNullOrEmpty(value) && decimal.TryParse(value, out var parsedValue))
 					return parsedValue;
 			}
 			catch (Exception e)
@@ -223,9 +224,9 @@ namespace MultiAdmin.Config
 		{
 			try
 			{
-				string value = GetString(key);
+				var value = GetString(key);
 
-				if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out bool parsedValue))
+				if (!string.IsNullOrEmpty(value) && bool.TryParse(value, out var parsedValue))
 					return parsedValue;
 			}
 			catch (Exception e)

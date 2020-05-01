@@ -29,7 +29,7 @@ namespace MultiAdmin.Features
 		{
 			if (waitFor > 0 && waiting)
 			{
-				int elapsed = (DateTime.Now - queueStartTime).Seconds;
+				var elapsed = (DateTime.Now - queueStartTime).Seconds;
 
 				if (elapsed >= waitFor)
 				{

@@ -10,7 +10,7 @@ namespace MultiAdmin.Tests.ServerIO
 		public void ShiftingListTest()
 		{
 			const int maxCount = 2;
-			ShiftingList shiftingList = new ShiftingList(maxCount);
+			var shiftingList = new ShiftingList(maxCount);
 
 			Assert.Equal(shiftingList.MaxCount, maxCount);
 		}
@@ -20,16 +20,16 @@ namespace MultiAdmin.Tests.ServerIO
 		{
 			const int maxCount = 2;
 			const int entriesToAdd = 6;
-			ShiftingList shiftingList = new ShiftingList(maxCount);
+			var shiftingList = new ShiftingList(maxCount);
 
-			for (int i = 0; i < entriesToAdd; i++)
+			for (var i = 0; i < entriesToAdd; i++)
 			{
 				shiftingList.Add($"Test{i}");
 			}
 
 			Assert.Equal(shiftingList.Count, maxCount);
 
-			for (int i = 0; i < shiftingList.Count; i++)
+			for (var i = 0; i < shiftingList.Count; i++)
 			{
 				Assert.Equal(shiftingList[i], $"Test{entriesToAdd - i - 1}");
 			}
@@ -40,21 +40,21 @@ namespace MultiAdmin.Tests.ServerIO
 		{
 			const int maxCount = 6;
 			const int entriesToRemove = 2;
-			ShiftingList shiftingList = new ShiftingList(maxCount);
+			var shiftingList = new ShiftingList(maxCount);
 
-			for (int i = 0; i < maxCount; i++)
+			for (var i = 0; i < maxCount; i++)
 			{
 				shiftingList.Add($"Test{i}");
 			}
 
-			for (int i = 0; i < entriesToRemove; i++)
+			for (var i = 0; i < entriesToRemove; i++)
 			{
 				shiftingList.RemoveFromEnd();
 			}
 
 			Assert.Equal(shiftingList.Count, Math.Max(maxCount - entriesToRemove, 0));
 
-			for (int i = 0; i < shiftingList.Count; i++)
+			for (var i = 0; i < shiftingList.Count; i++)
 			{
 				Assert.Equal(shiftingList[i], $"Test{maxCount - i - 1}");
 			}
@@ -65,14 +65,14 @@ namespace MultiAdmin.Tests.ServerIO
 		{
 			const int maxCount = 6;
 			const int indexToReplace = 2;
-			ShiftingList shiftingList = new ShiftingList(maxCount);
+			var shiftingList = new ShiftingList(maxCount);
 
-			for (int i = 0; i < maxCount; i++)
+			for (var i = 0; i < maxCount; i++)
 			{
 				shiftingList.Add($"Test{i}");
 			}
 
-			for (int i = 0; i < maxCount; i++)
+			for (var i = 0; i < maxCount; i++)
 			{
 				if (i == indexToReplace)
 				{

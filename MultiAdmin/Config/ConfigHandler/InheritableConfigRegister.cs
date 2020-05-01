@@ -55,7 +55,7 @@ namespace MultiAdmin.Config.ConfigHandler
 		/// <param name="highestToLowest">Whether to order the returned array from highest <see cref="ConfigRegister"/> in the hierarchy to the lowest.</param>
 		public ConfigRegister[] GetConfigRegisterHierarchy(bool highestToLowest = true)
 		{
-			List<ConfigRegister> configRegisterHierarchy = new List<ConfigRegister>();
+			var configRegisterHierarchy = new List<ConfigRegister>();
 
 			ConfigRegister configRegister = this;
 			while (configRegister != null && !configRegisterHierarchy.Contains(configRegister))

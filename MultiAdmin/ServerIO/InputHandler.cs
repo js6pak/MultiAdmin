@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using System.Threading;
 using MultiAdmin.Config;
@@ -12,11 +13,11 @@ namespace MultiAdmin.ServerIO
 	{
 		private static readonly char[] Separator = {' '};
 
-		public static readonly ColoredMessage BaseSection = new ColoredMessage(null, ConsoleColor.White);
+		public static readonly ColoredMessage BaseSection = new ColoredMessage(null, ConsoleColor.White.ToColor());
 
-		public static readonly ColoredMessage InputPrefix = new ColoredMessage("> ", ConsoleColor.Yellow);
-		public static readonly ColoredMessage LeftSideIndicator = new ColoredMessage("...", ConsoleColor.Yellow);
-		public static readonly ColoredMessage RightSideIndicator = new ColoredMessage("...", ConsoleColor.Yellow);
+		public static readonly ColoredMessage InputPrefix = new ColoredMessage("> ", ConsoleColor.Yellow.ToColor());
+		public static readonly ColoredMessage LeftSideIndicator = new ColoredMessage("...", ConsoleColor.Yellow.ToColor());
+		public static readonly ColoredMessage RightSideIndicator = new ColoredMessage("...", ConsoleColor.Yellow.ToColor());
 
 		public static int InputPrefixLength => InputPrefix?.Length ?? 0;
 
@@ -49,7 +50,7 @@ namespace MultiAdmin.ServerIO
 		{
 			try
 			{
-				ShiftingList prevMessages = new ShiftingList(25);
+				var prevMessages = new ShiftingList(25);
 
 				while (server.IsRunning && !server.IsStopping)
 				{
@@ -59,17 +60,17 @@ namespace MultiAdmin.ServerIO
 						continue;
 					}
 
-					string message = server.ServerConfig.UseNewInputSystem.Value ? GetInputLineNew(server, prevMessages) : Console.ReadLine();
+					var message = server.ServerConfig.UseNewInputSystem.Value ? GetInputLineNew(server, prevMessages) : Console.ReadLine();
 
 					if (string.IsNullOrEmpty(message)) continue;
 
-					server.Write($">>> {message}", ConsoleColor.DarkMagenta);
+					server.Write($">>> {message}", ConsoleColor.DarkMagenta.ToColor());
 
-					string[] messageSplit = message.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
+					var messageSplit = message.Split(Separator, StringSplitOptions.RemoveEmptyEntries);
 					if (messageSplit.IsEmpty()) continue;
 
-					bool callServer = true;
-					server.commands.TryGetValue(messageSplit[0].ToLower().Trim(), out ICommand command);
+					var callServer = true;
+					server.commands.TryGetValue(messageSplit[0].ToLower().Trim(), out var command);
 					if (command != null)
 					{
 						command.OnCall(messageSplit.Skip(1).Take(messageSplit.Length - 1).ToArray());
@@ -92,18 +93,18 @@ namespace MultiAdmin.ServerIO
 			if (server.ServerConfig.RandomInputColors.Value)
 				RandomizeInputColors();
 
-			string curMessage = string.Empty;
-			string message = string.Empty;
-			int messageCursor = 0;
-			int prevMessageCursor = -1;
+			var curMessage = string.Empty;
+			var message = string.Empty;
+			var messageCursor = 0;
+			var prevMessageCursor = -1;
 			StringSections curSections = null;
-			int lastSectionIndex = -1;
-			bool exitLoop = false;
+			var lastSectionIndex = -1;
+			var exitLoop = false;
 			while (!exitLoop)
 			{
 				#region Key Press Handling
 
-				ConsoleKeyInfo key = Console.ReadKey(true);
+				var key = Console.ReadKey(true);
 
 				switch (key.Key)
 				{
@@ -201,7 +202,7 @@ namespace MultiAdmin.ServerIO
 					{
 						curSections = GetStringSections(message);
 
-						StringSection? curSection = curSections.GetSection(IndexMinusOne(messageCursor), out int sectionIndex);
+						var curSection = curSections.GetSection(IndexMinusOne(messageCursor), out var sectionIndex);
 
 						if (curSection != null)
 						{
@@ -214,7 +215,7 @@ namespace MultiAdmin.ServerIO
 						}
 						else
 						{
-							server.Write("Error while processing input string: curSection is null!", ConsoleColor.Red);
+							server.Write("Error while processing input string: curSection is null!", ConsoleColor.Red.ToColor());
 						}
 					}
 					else
@@ -234,7 +235,7 @@ namespace MultiAdmin.ServerIO
 						// If the message length is longer than the buffer width (being cut into sections), re-write the message
 						if (curSections != null)
 						{
-							StringSection? curSection = curSections.GetSection(IndexMinusOne(messageCursor), out int sectionIndex);
+							var curSection = curSections.GetSection(IndexMinusOne(messageCursor), out var sectionIndex);
 
 							if (curSection != null)
 							{
@@ -258,7 +259,7 @@ namespace MultiAdmin.ServerIO
 							}
 							else
 							{
-								server.Write("Error while processing input string: curSection is null!", ConsoleColor.Red);
+								server.Write("Error while processing input string: curSection is null!", ConsoleColor.Red.ToColor());
 							}
 						}
 						else
@@ -293,7 +294,7 @@ namespace MultiAdmin.ServerIO
 
 		public static void SetCurrentInput(params ColoredMessage[] coloredMessages)
 		{
-			List<ColoredMessage> message = new List<ColoredMessage> {InputPrefix};
+			var message = new List<ColoredMessage> {InputPrefix};
 
 			if (coloredMessages != null)
 				message.AddRange(coloredMessages);
@@ -303,7 +304,7 @@ namespace MultiAdmin.ServerIO
 
 		public static void SetCurrentInput(string message)
 		{
-			ColoredMessage baseSection = BaseSection?.Clone();
+			var baseSection = BaseSection?.Clone();
 
 			if (baseSection == null)
 				baseSection = new ColoredMessage(message);
@@ -380,17 +381,17 @@ namespace MultiAdmin.ServerIO
 		{
 			try
 			{
-				Random random = new Random();
-				Array colors = Enum.GetValues(typeof(ConsoleColor));
+				var random = new Random();
+				var colors = Enum.GetValues(typeof(ConsoleColor));
 
-				ConsoleColor random1 = (ConsoleColor)colors.GetValue(random.Next(colors.Length));
-				ConsoleColor random2 = (ConsoleColor)colors.GetValue(random.Next(colors.Length));
+				var random1 = (ConsoleColor)colors.GetValue(random.Next(colors.Length));
+				var random2 = (ConsoleColor)colors.GetValue(random.Next(colors.Length));
 
-				BaseSection.textColor = random1;
+				BaseSection.textColor = random1.ToColor();
 
-				InputPrefix.textColor = random2;
-				LeftSideIndicator.textColor = random2;
-				RightSideIndicator.textColor = random2;
+				InputPrefix.textColor = random2.ToColor();
+				LeftSideIndicator.textColor = random2.ToColor();
+				RightSideIndicator.textColor = random2.ToColor();
 			}
 			catch (Exception e)
 			{
