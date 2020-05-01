@@ -29,7 +29,7 @@ namespace MultiAdmin
 		private static uint? portArg;
 		private static IExitSignal exitSignalListener;
 
-		private static readonly object ExitLock = new object();
+		private static bool exiting;
 
 		#region Server Properties
 
@@ -116,8 +116,9 @@ namespace MultiAdmin
 
 		private static void OnExit(object sender, EventArgs e)
 		{
-			lock (ExitLock)
+			if(!exiting)
 			{
+				exiting = true;
 				if (MultiAdminConfig.GlobalConfig.SafeServerShutdown.Value)
 				{
 					Write("Stopping servers and exiting MultiAdmin...", ConsoleColor.DarkMagenta.ToColor());

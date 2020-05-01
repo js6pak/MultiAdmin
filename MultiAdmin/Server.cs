@@ -413,7 +413,7 @@ namespace MultiAdmin
 					// Stop the input handler if it's running
 					if (inputHandlerThread.IsAlive)
 					{
-						inputHandlerThread.Abort();
+						inputHandlerThread.Interrupt();
 					}
 
 					outputHandler.Dispose();
