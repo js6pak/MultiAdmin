@@ -1,3 +1,5 @@
+# **If you are on SCP:SL 10.0+ use LA (LA+ incoming)**
+
 # MultiAdmin+
 MultiAdmin+ is a MultiAdmin fork adding few features
 
